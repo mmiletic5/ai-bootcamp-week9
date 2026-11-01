@@ -187,3 +187,83 @@ The earlier statement that the official template was not found is a preserved
 historical baseline observation. The template is now available separately at
 `docs/evidence-template.md`; this section does not claim it is currently
 missing.
+
+## W09-02 — Minimal Change Specification
+
+### Hypothesis and intended correction
+
+H1 can be addressed by restricting policy document selection to a source whose
+topic matches the request and whose `state` is `active`. The existing no-source
+refusal path should handle the absence of an eligible source without invoking
+the controlled model. This specification introduces neither a highest-revision
+rule, topic-specific exceptions, nor hardcoded policy text.
+
+### Acceptance criteria
+
+- Active documents matching the requested topic are eligible sources.
+- Archived documents are never selected merely because of array ordering.
+- Archived-only and missing topics return `refused` without model execution.
+- Successful responses preserve the selected source's text and citation
+  identity.
+- Existing `shipping`, `unsupported`, account-route, and invalid-request
+  behavior remains unchanged.
+
+### Expected before/after behavior
+
+Measured baseline results are 2/4 for evaluation and 5/7 for regression.
+`refund` returned the archived 30-day policy with an incorrect citation, and
+`legacy` returned an incorrect response after model invocation.
+
+The following are expected outcomes, not yet measured post-change results:
+
+- `refund`: the active 14-day policy with citation `refund-current`.
+- `legacy`: `refused` with zero model calls.
+- `shipping` and `unsupported`: retained PASS.
+- Account and invalid cases: retained PASS.
+- Evaluation: potentially 4/4; regression: potentially 7/7.
+
+### Independent test specification — Isidora
+
+Add `tests/source-eligibility.test.mjs`, importing and executing the actual
+application function from built `dist/app.js`, consistent with existing tests.
+Use only synthetic local documents unrelated to refund:
+
+- For topic `exchange`, put an archived source before an active source, with
+  different IDs and text. Assert `ok`, the active source's exact text, and its
+  sole citation.
+- For topic `retired-product`, provide only an archived source. Assert
+  `refused` and zero model calls.
+
+Run this test against the original, unmodified baseline commit so it produces a
+genuine assertion failure rather than a build or import failure. Preserve that
+output in `test-before.txt`; after integration, run the same test and preserve
+the passing output in `test-after.txt`. The test is supplementary evidence and
+must not duplicate or replace the application implementation or public
+evaluation dataset.
+
+### Scope and regression boundaries
+
+The planned implementation changes only necessary policy-selection logic in
+`src/app.ts`. It must not change account-route behavior, invalid-request
+behavior, model-error handling, the public dataset, existing tests, evaluation
+or comparison scripts, configuration, or the controlled model implementation.
+No UI, network integration, real LLM, or new evaluation framework is required.
+
+### Reproducibility and evidence
+
+The original baseline is `c866b73fe6091c2fdaea06fa6d086a817111a54f`. Preserve
+and compare the same public suite before and after the correction using
+`runs/evaluate-4aba6ff5-811d-4a77-a258-288d518bbe06` and
+`runs/regression-7b3aa34f-917a-42ee-976e-16c24a808cc1` as initial evidence.
+Inspect actual traces, model-call counts, and citations; preserve all generated
+evidence. The independent test adds evidence but does not change the public
+evaluation dataset.
+
+### Remaining limitations
+
+- Multiple simultaneously active revisions are not explicitly resolved by the
+  public contract.
+- The known unknown-account risk is outside H1.
+- A deterministic model substitute and small evaluation set do not establish
+  general production reliability.
+- No independent test or post-fix measurement has yet been executed.
