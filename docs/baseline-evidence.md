@@ -103,3 +103,87 @@ harness, generated reports, and scripts were not edited to fill these fields.
 - No final/post-fix evaluation, regression, comparison, commit, or push was
   performed.
 - The official `evidence-template.md` was not found in this repository.
+
+## W09-01 — Root Cause Analysis
+
+### Observed defect
+
+The preserved evaluation (`runs/evaluate-4aba6ff5-811d-4a77-a258-288d518bbe06`)
+and regression (`runs/regression-7b3aa34f-917a-42ee-976e-16c24a808cc1`) reports
+both record failures for `refund` and `legacy`.
+
+- `refund` requested policy topic `refund`, retrieved archived `refund-old`,
+  revision `1`, and returned `Policy: Refund period: 30 days.` with citation
+  `refund-old`. It failed exact text and citation checks. The dataset identifies
+  `refund-current`, revision `2`, as active and specifies a 14-day period.
+- `legacy` retrieved archived `legacy-old`, called the model, and returned
+  `ok`. Its criterion requires `refused` with zero model calls because no
+  eligible source exists.
+
+The recorded traces are
+`runs/evaluate-4aba6ff5-811d-4a77-a258-288d518bbe06/traces/refund.json`,
+`runs/evaluate-4aba6ff5-811d-4a77-a258-288d518bbe06/traces/legacy.json`, and
+their corresponding files under the preserved regression run.
+
+### Verified root cause
+
+In `src/app.ts`, policy retrieval uses the first document whose `topic` equals
+the request topic. It does not check document eligibility (`state ===
+"active"`). The public dataset orders archived `refund-old` before active
+`refund-current`, so the first-match code selects `refund-old`; the traces
+record that exact source ID and revision. The same logic selects archived-only
+`legacy-old` instead of finding no eligible source.
+
+This establishes the active-state omission as the cause in the supplied
+dataset. It does not establish a general policy for choosing among multiple
+active revisions; the public acceptance contract does not require a
+highest-revision rule.
+
+### Acceptance criteria and preserved behavior
+
+- Select an active source that matches the requested topic; never select
+  archived material merely because it appears first.
+- If no eligible source exists, return `refused` without invoking the model.
+- Preserve the correct source ID and citation.
+- Preserve accepted `shipping` and `unsupported` behavior.
+- Preserve the account route, including active and suspended account responses
+  and invalid-request handling.
+
+### Evaluation limitations
+
+The three basic tests cover invalid input, an unsupported topic with an empty
+document list, and a suspended account. They do not exercise a topic with both
+archived and active documents or an archived-only topic, so they did not detect
+H1.
+
+`weakCheck` only tests whether response text is nonempty; it is true for the
+incorrect refund and legacy responses and therefore does not establish policy
+correctness. The refund `recordedJudge` score of `0.95` is an authored
+synthetic example (`judge-fixture-1`), explicitly not a real model run; it is
+not evidence that the answer used the correct policy. Traces establish the
+recorded source ID/revision, model outcome, and response outcome for this
+deterministic run. They do not prove real-world policy truth, source provenance
+beyond the supplied dataset, or general production behavior.
+
+### Minimal proposed correction
+
+Restrict policy document selection to documents matching both the requested
+topic and active state. If no such document exists, preserve the existing
+refusal path without a model call. This is a conceptual proposal only; no
+source, test, dataset, script, or generated evidence was changed in W09-01.
+
+### Remaining risks and unexecuted checks
+
+- The public contract does not explicitly resolve multiple active revisions.
+- Unknown-account behavior is outside the H1 correction.
+- The small deterministic evaluation set does not establish general production
+  reliability.
+- An independent synthetic test and post-fix measurements have not yet been
+  executed.
+
+### Documentation consistency
+
+The earlier statement that the official template was not found is a preserved
+historical baseline observation. The template is now available separately at
+`docs/evidence-template.md`; this section does not claim it is currently
+missing.
