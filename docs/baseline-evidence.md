@@ -8,8 +8,9 @@
 - Verified baseline commit: `c866b73fe6091c2fdaea06fa6d086a817111a54f`
 - Environment: Node.js `v24.13.0`; npm `11.6.2`
 
-This is an internal checkpoint record. It does not replace the official
-`evidence-template.md`, which was not present in this repository when checked.
+This document preserves verified baseline results and serves as an internal
+checkpoint record throughout Week 9. The official submission template is
+maintained separately in `docs/evidence-template.md`.
 
 ## Commands and observed results
 
