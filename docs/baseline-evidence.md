@@ -267,3 +267,47 @@ evaluation dataset.
 - A deterministic model substitute and small evaluation set do not establish
   general production reliability.
 - No independent test or post-fix measurement has yet been executed.
+
+## W09-03 — Implementation Verification
+
+### Implementation
+
+Commit `5e4f992d48eb314038c1c8ec9282240ee9154029` changed `src/app.ts` only.
+The policy source-selection predicate now requires both a matching topic and
+`state === "active"`. The correction uses the existing no-source refusal path;
+it adds no highest-revision sorting, hardcoded policy answers, or unrelated
+behavior changes.
+
+### Verification results
+
+- `npm run typecheck` exited 0 and passed.
+- `npm test` exited 0; the Node runner reported one passing test file containing
+  the three existing basic assertions.
+- `shipping` returned `ok`, the three-day policy, and citation
+  `shipping-current`.
+- `refund` returned `ok`, the 14-day policy, and citation `refund-current`.
+- `legacy` returned `refused` with no citations.
+- `unknown` returned `refused` with no citations.
+
+The observed `shipping` retrieval trace identified `shipping-current`, revision
+1; the observed `refund` retrieval trace identified `refund-current`, revision
+2. `legacy` and `unknown` each had refusal-only traces. Zero model calls for
+those refusal cases were inferred from unchanged control flow and the absence
+of model events; they were not independently counted during CLI verification.
+
+### Evidence preservation
+
+The preserved baseline remains evaluation 2/4 and regression 5/7, at
+`runs/evaluate-4aba6ff5-811d-4a77-a258-288d518bbe06` and
+`runs/regression-7b3aa34f-917a-42ee-976e-16c24a808cc1`. This section does not
+claim final evaluation or regression has passed.
+
+### Outstanding work and limitations
+
+- Isidora's independent synthetic test has not been integrated or executed in
+  this implementation.
+- `test-before.txt` and `test-after.txt` are not available on this branch.
+- Final evaluation, regression, and controlled comparisons remain pending.
+- The unknown-account risk remains outside H1.
+- The controlled model and small public dataset do not establish production
+  reliability.
