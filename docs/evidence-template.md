@@ -6,7 +6,7 @@ Priložite automatske `report.json`, `summary.md` i direktorijume tragova. Ne pr
 
 ## Promena i hipoteza
 
-- Članovi para i ko ove nedelje vodi prikaz: Mateja Miletic i Isidora Prica; Mateja / zajedno.
+- Članovi para i ko ove nedelje vodi prikaz: Mateja Miletic i Isidora Prica; Isidora / zajedno.
 - Polazni/završni commit i putanje generisanih početnih/završnih izveštaja: polazni commit je `c866b73fe6091c2fdaea06fa6d086a817111a54f`; izmereni integracioni commit je `b449f2ab53ba02d14b8e481555711553524fb81e`; trenutni dokumentacioni HEAD je `ae7b0777ea9b7a6a0345e5335a6bd45fc3b08e8e`. Početni izveštaji su `runs/evaluate-4aba6ff5-811d-4a77-a258-288d518bbe06/report.json` i `runs/regression-7b3aa34f-917a-42ee-976e-16c24a808cc1/report.json`; završni su `runs/evaluate-89687b42-d2dc-4ae0-a696-d10638db1d91/report.json` i `runs/regression-d649f469-f10c-4ebb-a959-89a2899baec4/report.json`.
 - Koji problem smo opazili, koji trag ga podržava i zašto smo očekivali da ova izmena pomogne: H1 je birao prvi dokument iste teme bez provere aktivnog stanja. Početni trag za `refund` navodi arhivirani `refund-old`, revizija 1, a za `legacy` arhivirani `legacy-old`; oba su dovela do poziva modela. Zato smo očekivali da izbor samo izvora sa istom temom i `state === "active"` vrati aktivni izvor ili postojeće odbijanje kada prihvatljivog izvora nema.
 - Granica izmene i dodatna regresiona provera: minimalna izmena je samo u `src/app.ts`: predikat izbora izvora sada zahteva temu i aktivno stanje. Nisu menjani javni podaci, evaluator, postojeći testovi, account putanja ni realna LLM integracija. Dodatna provera je nezavisni sintetički test sa arhiviranim izvorom pre aktivnog i temom koja ima samo arhivirani izvor.
