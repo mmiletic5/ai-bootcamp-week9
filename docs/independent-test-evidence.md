@@ -65,10 +65,44 @@ Mateja and Isidora jointly reviewed the independent synthetic-test design,
 acceptance criteria, expected RED behavior, and evidence requirements. This
 record does not assign unverified individual command execution.
 
+## GREEN verification
+
+- Integration branch: `feature/h1-source-eligibility`
+- Integration merge: `61f297e539757e7dcbbcfdbe4a45cead54b87b65`
+- Implementation parent: `55553e5dda2f50b89b6ca159af0f25142fdf2f99`
+- Independent test parent: `68dd19da7ab40cbca7f6fb61a0e4e400ce2b083e`
+
+| Check | Observed exit code | Outcome |
+| --- | ---: | --- |
+| `npm run build` | 0 | Passed |
+| Independent test capture | 0 | Passed |
+| Supplemental individual-test diagnostic | 0 | 2 passed, 0 failed |
+| `npm run typecheck` | 0 | Passed |
+| `npm test` | 0 | 2 test files passed, 0 failed |
+
+| Scenario | RED baseline behavior | GREEN behavior |
+| --- | --- | --- |
+| Exchange | Archived 30-day text | `ok`; active 14-day text; `exchange-active` citation |
+| Retired product | `ok` from archived-only source | `refused`; no citations; zero model calls |
+
+The assertions and synthetic fixtures were unchanged between RED and GREEN.
+The passing `exchange` test verifies the active text, exact citation,
+`exchange-active` retrieval trace at revision 2, and one controlled-model call.
+The passing `retired-product` test verifies refusal, empty citations, and zero
+controlled-model calls.
+
+The standard Node test-runner capture reports a file-level summary. A separately
+labeled direct Node diagnostic in `test-after.txt` records both individual test
+cases passing. `test-before.txt` remains preserved unchanged. Final evaluation,
+regression, and release recommendation are still pending.
+
+Mateja and Isidora jointly reviewed the recorded RED and GREEN outcomes; this
+document does not assign unverified individual command execution.
+
 ## Pending steps
 
-- Independent test commit: pending
-- Integration with the approved H1 correction: pending
-- GREEN verification: pending
+- Independent test commit: completed (`68dd19da7ab40cbca7f6fb61a0e4e400ce2b083e`)
+- Integration with the approved H1 correction: completed
+- GREEN verification: completed; evidence in `test-after.txt`
 - Final evaluation and regression: pending
 - Final evidence report: pending
