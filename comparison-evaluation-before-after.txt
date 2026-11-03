@@ -1,0 +1,9 @@
+
+> support-reliability-lab@1.0.0 compare
+> node scripts/compare.mjs runs/evaluate-***/report.json runs/evaluate-***/report.json
+
+refund: FAIL -> PASS
+shipping: PASS -> PASS
+legacy: FAIL -> PASS
+unsupported: PASS -> PASS
+Before 2/4; after 4/4. Inspect traces and critical failures, not only totals.
