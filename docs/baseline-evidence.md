@@ -267,3 +267,141 @@ evaluation dataset.
 - A deterministic model substitute and small evaluation set do not establish
   general production reliability.
 - No independent test or post-fix measurement has yet been executed.
+
+## W09-03 — Implementation Verification
+
+### Implementation
+
+Commit `5e4f992d48eb314038c1c8ec9282240ee9154029` changed `src/app.ts` only.
+The policy source-selection predicate now requires both a matching topic and
+`state === "active"`. The correction uses the existing no-source refusal path;
+it adds no highest-revision sorting, hardcoded policy answers, or unrelated
+behavior changes.
+
+### Verification results
+
+- `npm run typecheck` exited 0 and passed.
+- `npm test` exited 0; the Node runner reported one passing test file containing
+  the three existing basic assertions.
+- `shipping` returned `ok`, the three-day policy, and citation
+  `shipping-current`.
+- `refund` returned `ok`, the 14-day policy, and citation `refund-current`.
+- `legacy` returned `refused` with no citations.
+- `unknown` returned `refused` with no citations.
+
+The observed `shipping` retrieval trace identified `shipping-current`, revision
+1; the observed `refund` retrieval trace identified `refund-current`, revision
+2. `legacy` and `unknown` each had refusal-only traces. Zero model calls for
+those refusal cases were inferred from unchanged control flow and the absence
+of model events; they were not independently counted during CLI verification.
+
+### Evidence preservation
+
+The preserved baseline remains evaluation 2/4 and regression 5/7, at
+`runs/evaluate-4aba6ff5-811d-4a77-a258-288d518bbe06` and
+`runs/regression-7b3aa34f-917a-42ee-976e-16c24a808cc1`. This section does not
+claim final evaluation or regression has passed.
+
+### Outstanding work and limitations
+
+- Isidora's independent synthetic test has not been integrated or executed in
+  this implementation.
+- `test-before.txt` and `test-after.txt` are not available on this branch.
+- Final evaluation, regression, and controlled comparisons remain pending.
+- The unknown-account risk remains outside H1.
+- The controlled model and small public dataset do not establish production
+  reliability.
+
+## W09-05 — Final Evaluation and Before/After Comparison
+
+### Final execution context
+
+The final public runs were executed on integration branch
+`feature/h1-source-eligibility` at
+`b449f2ab53ba02d14b8e481555711553524fb81e`. Git state was verified
+independently; tracked content was clean before the comparison-output artifacts
+were created. Generated `runs/` outputs are Git-ignored. The evaluation harness
+records `git.revision: null` and `git.dirty: null` in its reports, so those
+fields are not evidence of the verified Git revision or working-tree state.
+
+### Final evaluation
+
+`npm run evaluate` exited 0 and generated
+`runs/evaluate-89687b42-d2dc-4ae0-a696-d10638db1d91`. Its observed score was
+4/4:
+
+- `refund`: PASS.
+- `shipping`: PASS.
+- `legacy`: PASS.
+- `unsupported`: PASS.
+
+### Final regression
+
+`npm run regression` exited 0 and generated
+`runs/regression-d649f469-f10c-4ebb-a959-89a2899baec4`. Its observed score was
+7/7:
+
+- `refund`, `shipping`, `legacy`, and `unsupported`: PASS.
+- `active-account` and `suspended-account`: PASS.
+- `invalid`: PASS.
+
+### Controlled before/after comparisons
+
+The following comparisons each exited 0:
+
+```bash
+npm run compare -- runs/evaluate-4aba6ff5-811d-4a77-a258-288d518bbe06/report.json runs/evaluate-89687b42-d2dc-4ae0-a696-d10638db1d91/report.json
+npm run compare -- runs/regression-7b3aa34f-917a-42ee-976e-16c24a808cc1/report.json runs/regression-d649f469-f10c-4ebb-a959-89a2899baec4/report.json
+```
+
+Their authentic output is preserved in
+`comparison-evaluation-before-after.txt` and
+`comparison-regression-before-after.txt`.
+
+### Outcome comparison
+
+- Evaluation improved from 2/4 to 4/4.
+- Regression improved from 5/7 to 7/7.
+- `refund` changed from FAIL to PASS.
+- `legacy` changed from FAIL to PASS.
+- Every previously passing public-suite case remained PASS; no regression was
+  observed.
+
+### Trace-supported interpretation
+
+The baseline refund trace retrieved archived `refund-old`, revision 1, and the
+final trace retrieved active `refund-current`, revision 2. The answer changed
+from the 30-day policy to the 14-day policy; the recorded model-call count
+remained 1. Legacy changed from an archived-source `ok` response with one model
+call to `refused` with zero model calls. Shipping remained grounded in
+`shipping-current`, while unsupported requests remained refused. The final
+regression report also retained passing account and invalid-request cases.
+
+### Evidence links
+
+- Baseline evaluation:
+  `runs/evaluate-4aba6ff5-811d-4a77-a258-288d518bbe06`.
+- Final evaluation:
+  `runs/evaluate-89687b42-d2dc-4ae0-a696-d10638db1d91`.
+- Baseline regression:
+  `runs/regression-7b3aa34f-917a-42ee-976e-16c24a808cc1`.
+- Final regression:
+  `runs/regression-d649f469-f10c-4ebb-a959-89a2899baec4`.
+- Comparison output: `comparison-evaluation-before-after.txt` and
+  `comparison-regression-before-after.txt`.
+- Independent RED-to-GREEN evidence:
+  `docs/independent-test-evidence.md`, `test-before.txt`, and
+  `test-after.txt`.
+
+### Limitations
+
+The evaluation and regression are deterministic synthetic public-lab evidence;
+they do not establish general production reliability. The documented
+unknown-account issue remains outside H1 scope. No real LLM or production
+integration was tested.
+
+### Joint contribution
+
+Mateja and Isidora jointly reviewed and interpreted the final runs and the
+controlled before/after comparisons. This record does not attribute individual
+command execution beyond the verified evidence.

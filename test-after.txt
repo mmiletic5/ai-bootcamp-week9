@@ -1,0 +1,23 @@
+✔ tests/source-eligibility.test.mjs (96.242517ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 110.151365
+
+--- direct Node test-runner diagnostic: node tests/source-eligibility.test.mjs ---
+✔ active policy source takes precedence over an earlier archived source (3.181698ms)
+✔ archived-only policy topic is refused without model execution (0.372464ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16.133938
+
+[direct_module_exit_code=0]

@@ -1,0 +1,12 @@
+
+> support-reliability-lab@1.0.0 compare
+> node scripts/compare.mjs runs/regression-***/report.json runs/regression-***/report.json
+
+refund: FAIL -> PASS
+shipping: PASS -> PASS
+legacy: FAIL -> PASS
+unsupported: PASS -> PASS
+active-account: PASS -> PASS
+suspended-account: PASS -> PASS
+invalid: PASS -> PASS
+Before 5/7; after 7/7. Inspect traces and critical failures, not only totals.

@@ -1,10 +1,15 @@
 # Support Reliability Lab
 
-Sintetički asistent za podršku za Nedelju 9. Koristi lokalne izvore, jedan read-only lookup i deterministički zamenski model. Ne zahteva API ključ niti plaćeni model.
+## O projektu
+
+Sintetički asistent za podršku za Nedelju 9 koristi lokalne dokumente, jedan
+read-only lookup i deterministički kontrolisani model. Ne zahteva API ključ ni
+plaćeni model. H1 ispravka ograničava izbor policy izvora na traženu temu i
+`state === "active"`.
 
 ## Pokretanje
 
-Potreban je Node.js 24 ili noviji i npm. Iz direktorijuma aplikacije:
+Potreban je Node.js 24 ili noviji i npm.
 
 ```sh
 npm ci --ignore-scripts --no-audit --no-fund
@@ -15,20 +20,39 @@ npm run evaluate
 npm run regression
 ```
 
-`npm ci` prvi put preuzima zaključani TypeScript paket; kada je paket već u npm kešu, dodajte `--offline`. Izvođenje aplikacije ne koristi mrežu. Ako instalacija nije dostupna, obratite se kursnoj zajednici za pripremljeni paket/zavisnost; ne preskačite typecheck niti izmišljajte rezultate.
+Nezavisni H1 test se po potrebi pokreće sa `npm run build` i
+`node --test tests/source-eligibility.test.mjs`.
 
-Početni `evaluate` namerno završava kodom 1 sa 2/4 prolaza; `regression` ima 5/7. `npm test` ima tri osnovne provere i nije zamena za evaluaciju. Pokrenite sve provere i kada jedna otkrije problem.
+## Struktura projekta
 
-## Dokazi bez prepisivanja
+```text
+.
+├── src/app.ts                         # aplikaciona logika
+├── data/lab.json                      # javni sintetički podaci
+├── tests/                             # app.test.mjs i source-eligibility.test.mjs
+├── scripts/                           # pokretanje, evidencija i poređenje
+├── docs/                              # baseline, nezavisna i zvanična evidencija
+├── runs/                              # Git-ignored generisani izveštaji i tragovi
+├── test-before.txt / test-after.txt   # RED/GREEN transkripti
+├── comparison-*-before-after.txt      # izlazi kontrolisanih poređenja
+└── package.json                       # podržane npm skripte
+```
 
-Svaka evaluacija ispisuje novi direktorijum `runs/` sa `report.json`, `summary.md` i referencama na tragove. Sačuvajte putanju početnog i završnog izvršavanja. Uporedite dva izveštaja istog skupa:
+## Rezultati
+
+| Provera | Pre izmene | Posle izmene |
+| --- | --- | --- |
+| Evaluacija | 2/4 | 4/4 |
+| Regresija | 5/7 | 7/7 |
+| Nezavisni H1 test | RED 0/2 | GREEN 2/2 |
+
+Nezavisni test je napravljen kasnije i izvršen nad izvornom neispravnom implementacijom. `refund` je prešao sa arhivirane 30-dnevne na aktivnu 14-dnevnu politiku, a `legacy` na odbijanje bez izvršavanja modela. Prethodno prolazni slučajevi javnog skupa ostali su prolazni.
+
+## Dokazi i ograničenja
+
+Detaljna dokumentacija nalazi se u `docs/`. Rezultati poređenja sačuvani su u `comparison-evaluation-before-after.txt` i `comparison-regression-before-after.txt`, a nezavisna RED/GREEN provera u `test-before.txt` i `test-after.txt`.
+Za poređenje istog skupa koristite:
 
 ```sh
 npm run compare -- runs/IME-POCETNOG/report.json runs/IME-ZAVRSNOG/report.json
 ```
-
-U komandi zamenite oba naziva stvarnim putanjama iz konzole. Konfiguracija, podaci i harness moraju ostati isti; izmena poređenja nije dokaz poboljšanja. Ne prepisujte tabele, metapodatke ili hash-eve u izveštaj.
-
-Menja se TypeScript u `src/`; `dist/` je generisan. `data/lab.json` i kriterijumi su polazni ugovor, ne način da se rezultat ulepša. Kopija kursnog arhiva je rezervno početno stanje; sačuvajte svoj rad pre ponovnog raspakivanja u drugi direktorijum.
-
-Codex može pomoći u istrazi, izmeni i testovima, ali njegovo slaganje nije nezavisna potvrda. Ne unosite tajne ili privatne podatke. Nedeljni zadatak radi se u paru između petka i srede, ne tokom predavanja u petak.
