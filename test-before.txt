@@ -1,0 +1,74 @@
+✖ tests/source-eligibility.test.mjs (82.624836ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 99.006019
+
+✖ failing tests:
+
+test at tests/source-eligibility.test.mjs:1:1
+✖ tests/source-eligibility.test.mjs (82.624836ms)
+  'test failed'
+
+--- direct Node test-runner diagnostic (preserves assertion details) ---
+✖ active policy source takes precedence over an earlier archived source (3.412814ms)
+✖ archived-only policy topic is refused without model execution (0.680299ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16.515707
+
+✖ failing tests:
+
+test at tests/source-eligibility.test.mjs:5:1
+✖ active policy source takes precedence over an earlier archived source (3.412814ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'Policy: Exchange window: 30 days.'
+  - 'Policy: Exchange window: 14 days.'
+                              ^
+  
+      at TestContext.<anonymous> (file:///home/maki/Desktop/ai-bootcamp-week9/tests/source-eligibility.test.mjs:32:10)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.start (node:internal/test_runner/test:1003:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Policy: Exchange window: 30 days.',
+    expected: 'Policy: Exchange window: 14 days.',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/source-eligibility.test.mjs:40:1
+✖ archived-only policy topic is refused without model execution (0.680299ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'ok' !== 'refused'
+  
+      at TestContext.<anonymous> (file:///home/maki/Desktop/ai-bootcamp-week9/tests/source-eligibility.test.mjs:59:10)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'ok',
+    expected: 'refused',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+[direct_module_exit_code=1]
